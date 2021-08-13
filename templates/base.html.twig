@@ -4,6 +4,10 @@
         <meta charset="UTF-8">
          <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+        
+
+
+
         <!--<link href="{{asset('css/style.css')}}" rel="stylesheet" type="text/css">-->
         <link href="{{asset('css/sidebars.css')}}" rel="stylesheet" type="text/css">
          <!-- FONTAWESOME : https://kit.fontawesome.com/a23e6feb03.js -->
@@ -12,11 +16,14 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
         
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css">
+        
         <title>{% block title %}Welcome!{% endblock %}</title>
         {# Run `composer require symfony/webpack-encore-bundle`
            and uncomment the following Encore helpers to start using Symfony UX #}
         {% block stylesheets %}
             {#{{ encore_entry_link_tags('app') }}#}
+          
+        
            
         {% endblock %}
         
@@ -113,13 +120,13 @@
                                     <div class="d-grid gap-2">
                                       <button href="#submenu1" data-bs-toggle="collapse" class="btn btn-outline-secondary btn-2 ">
                                           <h3 class="nav-item"><svg class="bi" width="32" height="32"><use xlink:href="#speedometer2"/><use xlink:href="#dashboard"/></svg>
-                                          <span class="ms-1 d-none d-sm-inline">Dashboard</span>
+                                          <span class="ms-1 d-none d-sm-inline">Recibos</span>
                                           </h3> 
                                       </button>
                                     </div>
                                   <ul class="collapse nav flex-column ms-1" id="submenu1" data-bs-parent="#submenu1">
                                       <li class="w-100 mt-2" id="nav-link">
-                                          <a href="#" class="nav-link shadow"> <span class="d-none d-sm-inline">Item</span> 1</a>
+                                          <a href="{{path('app_recibo')}}" class="nav-link shadow"> <span class="d-none d-sm-inline">Lista Recibos</span> 1</a>
                                       </li>
                                       <li id="nav-link">
                                           <a href="#" class="nav-link"> <span class="d-none d-sm-inline">Item</span> 2</a>

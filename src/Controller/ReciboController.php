@@ -13,13 +13,18 @@ use Symfony\Component\Validator\Constraints\DateTime;
 class ReciboController extends AbstractController
 {
     /**
-     * @Route("/recibo/{id}", name="app_recibo_id")
+     * 
+     * @Route("/recibo", name="app_recibo")
      */
-    public function index($id)
+    public function recibo()
     {
-        //$comprobante= $pago->getComprobantePago();
-       // return $this->redirect("../ComprobantedePago/".$comprobante);
+        $manager= $this->getDoctrine()->getManager();
+        //traer todos los usuarios
+        $recibos= $manager->getRepository(Recibo::class)->findAll();
+
+        return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
     }
+
     /**
      * @Route("/load", name="load")
      */
@@ -86,5 +91,5 @@ class ReciboController extends AbstractController
 
     }
 
-    
+
 }
