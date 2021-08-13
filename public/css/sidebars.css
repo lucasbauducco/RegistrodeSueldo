@@ -123,3 +123,11 @@ main {
 
 
 
+.select,
+  #locale {
+    width: 100%;
+  }
+  .like {
+    margin-right: 10px;
+  }
+
