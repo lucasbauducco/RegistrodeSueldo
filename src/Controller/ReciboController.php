@@ -25,7 +25,7 @@ class ReciboController extends AbstractController
      */
     public function load()
     {
-        
+        set_time_limit(8100);
         $manager= $this->getDoctrine()->getManager();
         //traer todos los usuarios
         $user= $manager->getRepository(User::class)->findAll();
@@ -45,6 +45,7 @@ class ReciboController extends AbstractController
             13=> "SAC Junio",
             14=> "SAC Diciembre"
         );
+        
         foreach ($user as $usuarios) {
             $legajo= $usuarios->getLegajo();
             $email= $usuarios-> getEmail();
@@ -52,34 +53,37 @@ class ReciboController extends AbstractController
             $i=2018;
             $fechaCarga= new \DateTime();
             $anioActual= date("Y");
-            //recorro las carpetas por año, mes 
-            while ($i <= 2021 && $legajo!=null ) {
-                foreach ($array as $mes) {
-                    $uploads_dir = '..\\uploads\\recibos\\'."".$i.'\\'."".$mes;
-                    
-                    $configDirectories = array($uploads_dir);
-                    //pregunto si existe el archivo en la direccion
-                    $pathArchive='..\\uploads\\recibos\\'."".$i.'\\'."".$mes.'\\'."".$legajo.".pdf";
-                    
-                    if (file_exists('..\\uploads\\recibos\\'."".$i.'\\'."".$mes.'\\'."".$legajo.".pdf")) {
-                        //guardo recibos en la tabla
-                        $manager= $this->getDoctrine()->getManager();
-                        $anio=$i;
-                        $estado="Activo";
-                        $recibo= new Recibo($legajo, $email, $fechaCarga, $pathArchive, $anio,$mes, $estado);
+            //recorro las carpetas por año, mes
+            //if(!$legajo=null){
+                while ($i <= 2021 && $legajo!=null ) {
+                    foreach ($array as $mes) {
+                        $uploads_dir = '..\\uploads\\recibos\\'."".$i.'\\'."".$mes;
                         
-                        $manager->persist($recibo);
-                        $manager->flush();
-                    } else {
-                       ////////no hace nada
+                        $configDirectories = array($uploads_dir);
+                        //pregunto si existe el archivo en la direccion
+                        $pathArchive='..\\uploads\\recibos\\'."".$i.'\\'."".$mes.'\\'."".$legajo.".pdf";
+                        
+                        if (file_exists('..\\uploads\\recibos\\'."".$i.'\\'."".$mes.'\\'."".$legajo.".pdf")) {
+                            //guardo recibos en la tabla
+                            
+                            $anio=$i;
+                            $estado="Activo";
+                            $recibo= new Recibo($legajo, $email, $fechaCarga, $pathArchive, $anio,$mes, $estado);
+                            
+                            $manager->persist($recibo);
+                            $manager->flush();
+                        } else {
+                        ////////no hace nada
+                        }
+                
                     }
-            
+                    $i++;
                 }
-                $i++;
-            }
+        //  }
+            
         }
         return $this->redirectToRoute("redirectInicio");
-       
+
     }
 
     
