@@ -3,59 +3,46 @@
 {% block title %}Hello ReciboController!{% endblock %}
 
 {% block stylesheets %}
-            {#{{ encore_entry_link_tags('app') }}#}
-            <!-- DataTables -->
-<link href="{{asset('css/datatable.css')}}" rel="stylesheet" type="text/css">
-
-
-
-           
+    {{[parent()]}}
 {% endblock %}
 {% block body %}
 
-<main class="container">
-    <div class="datatable">
-                <table id="datatable" class="table table-striped table-secondary table-bordered" width="100%">
-                    <thead>
-                        <tr>
-                            <th><a href="{{path('app_recibo')}}" class="nav-link shadow"> <span class="d-none d-sm-inline">Usuario</span></a></th>
-                            <th> Legajo </th>
-                            <th> Fecha Carga </th>
-                            <th> Path </th>
-                            <th> Mes</th>
-                            <th> Año </th>
-                            <th> Estado </th>
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for recibo in recibos %}
-                            <tr >
-                                               
-                                    <td>{{ recibo.usuario }}</td>
-                                    <td>{{ recibo.legajo }}</td>
-                                    
-                                    <td>{{ recibo.fechaCarga|date('d-m-Y')}}</td>
-                                    <td>{{ recibo.pathArchive}}</td>  
-                                    <td>{{ recibo.mes}}</td>  
-                                    <td>{{ recibo.anio}}</td>  
-                                    <td>{{ recibo.Estado}}</td>
-                                    {#<td>{{ empresas.fechaModificacion|date('d-m-Y')}}</td>
-                                    <td>{{ empresas.ultimoUsuario}}</td> #}
-                                </tr>
-                        {% endfor %}
-                        
-                    </tbody>
-                </table>
-
-    </div>
-        
-</main>
-
-    
+    <table id="example" class="table table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th><a href="{{path('app_recibo')}}" class="nav-link shadow"> <span class="d-none d-sm-inline">Usuario</span></a></th>
+                <th> Legajo </th>
+                <th> Fecha Carga </th>
+                <th> Path </th>
+                <th> Mes</th>
+                <th> Año </th>
+                <th> Estado </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for recibo in recibos|slice(1,10) %}
+                <tr>              
+                    <td>{{ recibo.usuario }}</td>
+                    <td>{{ recibo.legajo }}</td>
+                    
+                    <td>{{ recibo.fechaCarga|date('d-m-Y')}}</td>
+                    <td>{{ recibo.pathArchive}}</td>  
+                    <td>{{ recibo.mes}}</td>  
+                    <td>{{ recibo.anio}}</td>  
+                    <td>{{ recibo.Estado}}</td>
+                </tr>
+            {% endfor %}
+            
+        </tbody>
+    </table>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#example').DataTable();
+        } );
+    </script>
 {% endblock %}
 {% block javascript %}
-
+ {{[parent()]}}
 {% endblock %}
 
 
