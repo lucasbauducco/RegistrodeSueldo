@@ -10,10 +10,76 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Constraints\Regex;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
+
+use App\Form\CargarRecibosType;
 class ReciboController extends AbstractController
 {
+    /**
+     * 
+     * @Route("/cargarRecibo/{anio}/{mes}", name="app_cargar_recibo")
+     */
+    public function cargarRecibo(Request $request,SluggerInterface $slugger, $anio,$mes){
+        $manager= $this->getDoctrine()->getManager();
+        $dateTime = new \DateTime();
+        $day = $dateTime->format('d-m-Y');
 
+        $manager=$this->getDoctrine()->getManager();
+        
+
+        
+
+        $formulario = $this->createForm(CargarRecibosType::class);
+        $formulario->handleRequest($request);
+        
+        if ($formulario->isSubmitted() && $formulario->isValid()) {
+            /** @var UploadedFile $brochureFile */
+                $archivos = $formulario->get('archivos')->getData();
+                if ($archivos!=null) {
+                    foreach ($archivos as $archivo) {
+                        try {
+                                
+                                
+                                $originalFilename = pathinfo($archivo->getClientOriginalName(), PATHINFO_FILENAME);
+                                $usuario= new User();
+                                $usuario= $manager->getRepository(User::class)->findOneBy(array('legajo' =>  $originalFilename));
+                                //$brochureFile->getClientOriginalName()
+                                // this is needed to safely include the file name as part of the URL
+                                $safeFilename = $slugger->slug($originalFilename);
+                                $newFilename = $safeFilename.'.'.$archivo->guessExtension();
+                                $newFilename= '..\\uploads\\recibos\\'."".$anio.'\\'."".$mes.'\\'.$newFilename;
+
+                                $documento= new Recibo($originalFilename,$usuario->getEmail(),$dateTime, $newFilename, $anio,$mes,"Activo");
+                                
+                                $uploads_dir = '..\\uploads\\recibos\\'."".$anio.'\\'."".$mes;
+                                $archivo->move(
+                                    $uploads_dir,
+                                    $newFilename
+                                );
+                                $manager->persist($documento);
+                                $manager->flush();
+                        }catch (\Throwable $th) {
+                            $this -> addFlash('error', '¡Error al guardar los archivos!'.$th);
+                            return $this->render('recibo/cargarRecibos.html.twig', [
+                                'formulario' => $formulario->createView(),
+                            ]);
+                        }
+                    }
+
+            }
+            return $this->render('recibo/cargarRecibos.html.twig', [
+                'formulario' => $formulario->createView(),
+            ]);
+
+
+        }
+        return $this->render('recibo/cargarRecibos.html.twig', [
+            'formulario' => $formulario->createView(),
+        ]);
+    }
     /**
      * 
      * @Route("/recibo", name="app_recibo")
