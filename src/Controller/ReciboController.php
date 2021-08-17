@@ -9,9 +9,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Validator\Constraints\DateTime;
+use Symfony\Component\HttpFoundation\Request;
 
 class ReciboController extends AbstractController
 {
+
     /**
      * 
      * @Route("/recibo", name="app_recibo")
@@ -24,6 +26,72 @@ class ReciboController extends AbstractController
 
         return $this->render('recibo/dataTable.html.twig', ["recibos"=> $recibos]);
     }
+    /**
+     * 
+     * @Route("/recibo/{id}", name="app_recibo_id")
+     */
+    public function reciboId($id)
+    {
+        $manager= $this->getDoctrine()->getManager();
+        //traer todos los usuarios
+        $recibos= $manager->getRepository(Recibo::class)->findOneBy(array('legajo' => $id));
+        if(!$recibos!=null){
+            $this -> addFlash('success', 'Ya puede visualizar su Recibo de Sueldo!');
+            return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
+            
+        }
+        $this -> addFlash('error', '(id)Error no pudimos cargar sus Recibos de Sueldo, si el error persiste consultar a soporte@unraf.com.ar');
+        return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
+    }
+    /**
+     * 
+     * @Route("/reciboAnio/{anio}", name="app_recibo_Anio")
+     */
+    public function reciboAnio($anio)
+    {
+        $manager= $this->getDoctrine()->getManager();
+        //traer todos los usuarios
+        $recibos= $manager->getRepository(Recibo::class)->findOneBy(array('anio' => $anio));
+        if(!$recibos!=null){
+            $this -> addFlash('success', 'Ya puede visualizar su Recibo de Sueldo!');
+            return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
+            
+        }
+        $this -> addFlash('error', '(Anio)Error no pudimos cargar sus Recibos de Sueldo, si el error persiste consultar a soporte@unraf.com.ar');
+        return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
+    }
+    /**
+     * 
+     * @Route("/reciboMes/{mes}", name="app_recibo_mes")
+     */
+    public function reciboMes($mes)
+    {
+        $manager= $this->getDoctrine()->getManager();
+        //traer todos los usuarios
+        $recibos= $manager->getRepository(Recibo::class)->findOneBy(array('anio' => $mes));
+        if(!$recibos!=null){
+            $this -> addFlash('success', 'Ya puede visualizar su Recibo de Sueldo!');
+            return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
+            
+        }
+        $this -> addFlash('error', '(mes)Error no pudimos cargar sus Recibos de Sueldo, si el error persiste consultar a soporte@unraf.com.ar');
+        return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
+    }
+    /**
+     * 
+     * @Route("/reciboUsuario/{usuario}", name="app_recibo_usuario")
+     */
+    public function reciboUsuario($usuario)
+    {
+        $manager= $this->getDoctrine()->getManager();
+        //traer todos los usuarios
+        $recibos= $manager->getRepository(Recibo::class)->findBy(array('usuario' => $usuario));
+        
+        //$this -> addFlash('error', '(mes)Error no pudimos cargar sus Recibos de Sueldo, si el error persiste consultar a soporte@unraf.com.ar');
+        return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
+    }
+    
+
 
     /**
      * @Route("/load", name="load")
