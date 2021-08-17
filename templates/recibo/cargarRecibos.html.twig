@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ReciboController!{% endblock %}
+
+{% block body %}
+<h1 class = "text-center text-info">Cargar Archivos</h1> 
+                            {{ form_start(formulario, {'enctype':'multipart/form-data'})}}
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                            <h6 class = "text-left text-info">Archivos</h6>
+                                            {{ form_widget(formulario.archivos) }}
+                                            
+                                    </div>
+                                    <div class="col-sm-6">
+                                        
+                                       
+                                    </div>
+                                    
+                                </div>
+                               
+            
+                            
+                            <div class = "container mt-5 text-center" align="left">
+                                {{ form_widget(formulario.Guardar, {attr: {class: 'btn btn-outline-info btn-lg'}})}}
+                                <a href="{{path('inicio')}}" class="btn btn-outline-info btn-lg" role="button">VOLVER</a>
+                            </div>
+                            
+                            {{ form_end(formulario) }}
+{% endblock %}
