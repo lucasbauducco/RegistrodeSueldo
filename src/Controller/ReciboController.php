@@ -22,7 +22,7 @@ class ReciboController extends AbstractController
         //traer todos los usuarios
         $recibos= $manager->getRepository(Recibo::class)->findAll();
 
-        return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
+        return $this->render('recibo/dataTable.html.twig', ["recibos"=> $recibos]);
     }
 
     /**

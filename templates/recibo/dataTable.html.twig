@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probando</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" type="text/css" href="{{asset('css/datatable.css')}}">
+</head>
+<body>
+    <div id="contenedor_carga">
+        <div id="carga"></div>
+        <h5 class="textInfo">Cargando los recibos, por favor espere...</h5>
+    </div>
+    <div class="container-fluid p-3" >
+        <table id="example" class="table table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th> Usuario </th>
+                    <th> Legajo </th>
+                    <th> Fecha Carga </th>
+                    <th> Path </th>
+                    <th> Mes</th>
+                    <th> Año </th>
+                    <th> Estado </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for recibo in recibos %}
+                    {# {% if recibo.usuario != null or recibo.usuario != '' %} #}
+                        <tr>              
+                            <td>{{ recibo.usuario }}</td>
+                            <td>{{ recibo.legajo }}</td>
+                            <td>{{ recibo.fechaCarga|date('d-m-Y')}}</td>
+                            <td>{{ recibo.pathArchive}}</td>  
+                            <td>{{ recibo.mes}}</td>  
+                            <td>{{ recibo.anio}}</td>  
+                            <td>{{ recibo.Estado}}</td>
+                        </tr>
+                    {# {% endif %} #}
+                {% endfor %}
+                
+            </tbody>
+        </table>
+    <div>
+    
+    {# SIOSI DEJARLOS ACA #}
+   <script type="text/javascript">
+        window.onload = function(){
+            var contenedor = document.getElementById('contenedor_carga');
+            contenedor.style.visibility = 'hidden';
+            contenedor.style.opacity = '0'; 
+        }
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#example').DataTable();
+        } );
+    </script>
+</body>
+</html>
