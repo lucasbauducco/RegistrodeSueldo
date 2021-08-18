@@ -37,7 +37,7 @@
                             <td>{{ recibo.usuario }}</td>
                             <td>{{ recibo.legajo }}</td>
                             <td>{{ recibo.fechaCarga|date('d-m-Y')}}</td>
-                            <td>{{ recibo.pathArchive}}</td>  
+                            <td><a href="{{path('verPDF', recibo.pathArchive )}}"  class="btn btn-outline-info btn-lg" target="_blank">Recibo</a></td>  
                             <td>{{ recibo.mes}}</td>  
                             <td>{{ recibo.anio}}</td>  
                             <td>{{ recibo.Estado}}</td>

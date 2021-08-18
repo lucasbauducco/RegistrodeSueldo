@@ -13,16 +13,34 @@
                                     </div>
                                     <div class="col-sm-6">
                                         
-                                       
                                     </div>
-                                    
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                            <h6 class = "text-left text-info">Mes</h6>
+                                            {{ form_widget(formulario.mes) }}
+                                            
+                                    </div>
+                                    <div class="col-sm-6">
+                                        
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                            <h6 class = "text-left text-info">Fecha</h6>
+                                            {{ form_widget(formulario.fecha) }}
+                                            
+                                    </div>
+                                    <div class="col-sm-6">
+                                        
+                                    </div>
                                 </div>
                                
             
                             
                             <div class = "container mt-5 text-center" align="left">
                                 {{ form_widget(formulario.Guardar, {attr: {class: 'btn btn-outline-info btn-lg'}})}}
-                                <a href="{{path('inicio')}}" class="btn btn-outline-info btn-lg" role="button">VOLVER</a>
+                                <a href="#" class="btn btn-outline-info btn-lg" role="button">VOLVER</a>
                             </div>
                             
                             {{ form_end(formulario) }}
