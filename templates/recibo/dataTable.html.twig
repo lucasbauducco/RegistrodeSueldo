@@ -24,10 +24,10 @@
                     <th> Usuario </th>
                     <th> Legajo </th>
                     <th> Fecha Carga </th>
-                    <th> Path </th>
                     <th> Mes</th>
                     <th> Año </th>
                     <th> Estado </th>
+                    <th> Ver Recibo </th>
                 </tr>
             </thead>
             <tbody>
@@ -36,11 +36,11 @@
                         <tr>              
                             <td>{{ recibo.usuario }}</td>
                             <td>{{ recibo.legajo }}</td>
-                            <td>{{ recibo.fechaCarga|date('d-m-Y')}}</td>
-                            <td><a href="{{path('verPDF', recibo.pathArchive )}}"  class="btn btn-outline-info btn-lg" target="_blank">Recibo</a></td>  
+                            <td>{{ recibo.fechaCarga|date('d-m-Y')}}</td>  
                             <td>{{ recibo.mes}}</td>  
                             <td>{{ recibo.anio}}</td>  
                             <td>{{ recibo.Estado}}</td>
+                            <td><a href="{{recibo.PathArchive}}"  class="btn btn-outline-info btn-lg" target="_blank">Recibo</a></td>
                         </tr>
                     {# {% endif %} #}
                 {% endfor %}

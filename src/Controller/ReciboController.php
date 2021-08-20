@@ -25,12 +25,7 @@ class ReciboController extends AbstractController
      * conficurar php.ini server
      * 
      * max_file_uploads = 600
-     * memory_limit = 200M
-     * post_max_size = 200M
-     * upload_max_filesize = 600M
-     * post_max_size = 650M
-     * max_execution_time = 500
-     * max_input_time = 500
+     * 
      * 
      * @Route("/cargarRecibo", name="app_cargar_recibo")
      */
@@ -41,14 +36,11 @@ class ReciboController extends AbstractController
 
         $manager=$this->getDoctrine()->getManager();
         
-
-        
-
         $formulario = $this->createForm(CargarRecibosType::class);
         $formulario->handleRequest($request);
         
         if ($formulario->isSubmitted() && $formulario->isValid()) {
-            /** @var UploadedFile $brochureFile */
+            
                 //traigo los archivos cargados del formulario y los almaceno en una variable
                 $archivos = $formulario->get('archivos')->getData();
                 $mes=$formulario->get('mes')->getData();
@@ -56,60 +48,20 @@ class ReciboController extends AbstractController
                 $anio=  $anio->format("Y");
                 
                 try {
-                    foreach ($archivos as $archivo) {
-                        
-                            
-                                //extraigo el nombre del archivo
-                                $originalFilename = pathinfo($archivo->getClientOriginalName(), PATHINFO_FILENAME);
-                                $usuario= new User();
-                                //busco el usuario por el legajo cargado en el nombre del archivo
-                                $usuario= $manager->getRepository(User::class)->findOneBy(array('legajo' =>  $originalFilename));
-                                 //$brochureFile->getClientOriginalName()
-                                        // this is needed to safely include the file name as part of the URL
-                                        //creo la dirreccion url del archivo
-                                        $safeFilename = $slugger->slug($originalFilename);
-                                        $newFilename = $safeFilename.'.'.$archivo->guessExtension();
-                                        $newFilename= '\\uploads\\recibos\\'."".$anio.'\\'."".$mes.'\\'.$newFilename;
-                                        //si tienen correo se les asigna sino se les sea no asignado
-                                if($usuario!=null)
-                                {
-                                       
-                                        //genero un objeto recibo y seteo los parametros por constructor
+                    //esta funcion guarda los archivos en una carpeta y en la tabla recibo
+                    $cargando= $this->guardarDatos($slugger,$archivos,$manager,$anio,$mes,$dateTime,$formulario);
 
-                                        $documento= new Recibo($originalFilename,$usuario->getEmail(),$dateTime, $newFilename, $anio,$mes,"Activo");
-                                        //almaceno el archivo en la carpeta
-                                        $uploads_dir = '\\uploads\\recibos\\'."".$anio.'\\'."".$mes;
-                                        
-                                        $archivo->move(
-                                            $uploads_dir,
-                                            $newFilename
-                                        );
-                                        //guardo en base de datos
-                                        $manager->persist($documento);
-                                        $manager->flush();
-                                    
-                                }else {
-                                    $usuario= null;
-                                    $email= "no tiene";
-                                    //genero un objeto recibo y seteo los parametros por constructor
 
-                                    $documento= new Recibo($originalFilename,$email,$dateTime, $newFilename, $anio,$mes,"Activo");
-                                    //almaceno el archivo en la carpeta
-                                    $uploads_dir = '..\\uploads\\recibos\\'."".$anio.'\\'."".$mes;
-                                    
-                                    $archivo->move(
-                                        $uploads_dir,
-                                        $newFilename
-                                    );
-                                    //guardo en base de datos
-                                    $manager->persist($documento);
-                                    $manager->flush();
-                                    
-                                }
-                                
-                               
-                                
-                                
+                    if($cargando){
+                        $this -> addFlash('succes', '¡Los archivos se cargaron exitosamente!');
+                        return $this->render('recibo/cargarRecibos.html.twig', [
+                            'formulario' => $formulario->createView(),
+                        ]);
+                    }else{
+                        $this -> addFlash('error', '¡Error en la carga de archivos!');
+                        return $this->render('recibo/cargarRecibos.html.twig', [
+                            'formulario' => $formulario->createView(),
+                        ]);
                     }
 
                 }catch (\Throwable $th) {
@@ -118,27 +70,72 @@ class ReciboController extends AbstractController
                         'formulario' => $formulario->createView(),
                     ]);
                 }
-            $this -> addFlash('succes', '¡Los archivos se cargaron exitosamente!');
-            return $this->render('recibo/cargarRecibos.html.twig', [
-                'formulario' => $formulario->createView(),
-            ]);
         }
         return $this->render('recibo/cargarRecibos.html.twig', [
             'formulario' => $formulario->createView(),
         ]);
     }
 
-     /**
-     * @Route("verPDF/{path}", name="verPDF")
-     */
-    public function verPDF(Request $request, $path){
-        $manager=$this->getDoctrine()->getManager();
-
+   
+    private function guardarDatos($slugger,$archivos, $manager,$anio,$mes,$dateTime,$formulario){
         
+            try {
+                
+                foreach ($archivos as $archivo){
+                    /** @var UploadedFile $brochureFile */
+                    //extraigo el nombre del archivo
+                    $originalFilename = pathinfo($archivo->getClientOriginalName(), PATHINFO_FILENAME);
+                    $usuario= new User();
+                    //busco el usuario por el legajo cargado en el nombre del archivo
+                    $usuario= $manager->getRepository(User::class)->findOneBy(array('legajo' =>  $originalFilename));
+                    //$brochureFile->getClientOriginalName()
+                            // this is needed to safely include the file name as part of the URL
+                            //creo la dirreccion url del archivo
+                            $safeFilename = $slugger->slug($originalFilename);
+                            $newFilename = $safeFilename.'.'.$archivo->guessExtension();
+                            $newFilename= '\\Intranet\\uploads\\recibos\\'."".$anio.'\\'."".$mes.'\\'.$newFilename;
+                            //si tienen correo se les asigna sino se les sea no asignado
+                    if($usuario!=null)
+                    {
+                            //genero un objeto recibo y seteo los parametros por constructor
+                            $documento= new Recibo($originalFilename,$usuario->getEmail(),$dateTime, $newFilename, $anio,$mes,"Activo");
+                            //almaceno el archivo en la carpeta
+                            $uploads_dir = '..\\uploads\\recibos\\'."".$anio.'\\'."".$mes;
+                            
+                            $archivo->move(
+                                $uploads_dir,
+                                $newFilename
+                            );
+                            //guardo en base de datos
+                            $manager->persist($documento);
+                            $manager->flush();
+                        
+                    }else {
+                        $usuario= null;
+                        $email= "no tiene";
+                        //genero un objeto recibo y seteo los parametros por constructor
         
-        return $this->redirect('//recibodesueldo//'.$path);
-
+                        $documento= new Recibo($originalFilename,$email,$dateTime, $newFilename, $anio,$mes,"Activo");
+                        //almaceno el archivo en la carpeta
+                        $uploads_dir = '..\\uploads\\recibos\\'."".$anio.'\\'."".$mes;
+                        
+                        $archivo->move(
+                            $uploads_dir,
+                            $newFilename
+                        );
+                        //guardo en base de datos
+                        $manager->persist($documento);
+                        $manager->flush();
+                        
+                    }
+                }
+                return true;
+            } catch (\Throwable $th) {
+                
+                return false;
+            }             
     }
+    
   
 
 
@@ -263,7 +260,7 @@ class ReciboController extends AbstractController
                         
                         $configDirectories = array($uploads_dir);
                         //pregunto si existe el archivo en la direccion
-                        $pathArchive='uploads\\recibos\\'."".$i.'\\'."".$mes.'\\'."".$legajo.".pdf";
+                        $pathArchive='\\Intranet\\uploads\\recibos\\'."".$i.'\\'."".$mes.'\\'."".$legajo.".pdf";
                         
                         if (file_exists('..\\uploads\\recibos\\'."".$i.'\\'."".$mes.'\\'."".$legajo.".pdf")) {
                             //guardo recibos en la tabla
