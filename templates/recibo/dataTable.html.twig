@@ -1,33 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Probando</title>
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" type="text/css" href="{{asset('css/datatable.css')}}">
-</head>
-<body>
+{% extends 'base.html.twig' %}
+
+{% block title %}Ver legajos{% endblock %}
+
+{% block body %}
+    {{parent()}}
+    {% if is_granted('ROLE_SUPERADMIN') %}
+        <div class="container-fluid mt-2">
+            {# <a class="btn btn-outline-info" href="{{path('app_recibo')}}">Ver todos los legajos</a> #}
+            <button class="btn btn-outline-info" onclick="verTodosRecibos()">Ver todos los legajos</button>
+            {# <div class-"container añoRecibo" id="añoRecibo">
+                <h4> Ingrese por favor el año que desea ver <span class="text-success">(?)</span><h4>
+                <input class="form-control w-75" type="text" >
+            </div> #}
+            <form  action="{{ path('app_recibo') }}"  method="post">
+                <div class="container-fluid anioRecibo mt-2" id="anioRecibo">
+                    <b class="text-left" style="color: #096066;"> Ingrese el año que desea ver</b>
+                    <input class="form-control w-25" name="anioLegajo" type="number" min="2000" max="2100" required>
+                    <input class="mt-2 btn btn-outline-secondary" type="submit" value="Ver">
+                </div>
+            </form> 
+        </div>
+    {% endif %}
+    {% if is_granted('ROLE_ADMIN') %}
+    <div class="container-fluid mt-2">
+        <button class="btn btn-outline-info" onclick="myFunction()">Cargar Recibos</button>
+    </div>
+    <div class="container mt-3 divCargarLegajos" id="cargarLegajos">
+        <h3 class = "text-center mt-1" style="color: #096066;">Cargar Archivos</h3>    
+        {{ form_start(formulario, {'enctype':'multipart/form-data'})}}
+            <div class="row mt-3">
+                <div class="col-sm-6">
+                    <h6 class = "text-left" style="color: #096066;">Mes</h6>
+                    {{ form_widget(formulario.mes) }} 
+                </div>
+                <div class="col-sm-6">
+                    <h6 class = "text-left" style="color: #096066;">Fecha</h6>
+                    {{ form_widget(formulario.fecha) }} 
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-sm-4">
+                    <h6 class = "text-left" style="color: #096066;">Archivos</h6>
+                    {{ form_widget(formulario.archivos) }}      
+                </div>
+                <div class="col-sm-8"></div>
+            </div>
+            <div class = " mt-5 text-center" align="left">
+                <a onclick="myFunction()" class="botonCancelar btn btn-outline-info" role="button">Cancelar</a>
+                {{ form_widget(formulario.Guardar, {attr: {class: 'btn btn-outline-info'}})}}
+            </div>
+            <br>
+        {{ form_end(formulario) }}
+    </div>
+    {% endif %}
     <div id="contenedor_carga">
         <div id="carga"></div>
         <h5 class="textInfo">Cargando los recibos, por favor espere...</h5>
     </div>
-    <div class="container-fluid p-3" >
-        <table id="example" class="table table-striped" style="width:100%">
-            <thead>
-                <tr>
+    <div class="container-fluid p-4" >
+        <table id="tablaLegajos" class="table table-bordered" style="width:100%">
+            <thead style="background-color: #0F9FA8">
+                <tr class="text-white">
                     <th> Usuario </th>
                     <th> Legajo </th>
-                    <th> Fecha Carga </th>
+                    {# <th> Fecha Carga </th> #}
                     <th> Mes</th>
                     <th> Año </th>
                     <th> Estado </th>
-                    <th> Ver Recibo </th>
+                    <th> Ver recibo </th>
                 </tr>
             </thead>
             <tbody>
@@ -36,11 +76,12 @@
                         <tr>              
                             <td>{{ recibo.usuario }}</td>
                             <td>{{ recibo.legajo }}</td>
-                            <td>{{ recibo.fechaCarga|date('d-m-Y')}}</td>  
+                            {# <td>{{ recibo.fechaCarga|date('d-m-Y')}}</td> #}
                             <td>{{ recibo.mes}}</td>  
                             <td>{{ recibo.anio}}</td>  
                             <td>{{ recibo.Estado}}</td>
-                            <td><a href="{{recibo.PathArchive}}"  class="btn btn-outline-info btn-lg" target="_blank">Recibo</a></td>
+                            {# <td class="text-center text-info"><a href="{{recibo.PathArchive}}" target="_blank">Ver recibo</a></td> #}
+                            <td class="text-center text-info"><a href="{{recibo.PathArchive}}" target="_blank"><i class="text-danger far fa-file-pdf"  style = "font-size: 25px;"></i></a></td>
                         </tr>
                     {# {% endif %} #}
                 {% endfor %}
@@ -48,20 +89,28 @@
             </tbody>
         </table>
     <div>
-    
-    {# SIOSI DEJARLOS ACA #}
-   <script type="text/javascript">
+    {% block notificaciones %}
+        {{parent()}}
+    {% endblock %}
+{% endblock %}
+{% block javascripts %}
+    {{parent()}}
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#tablaLegajos').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript">
         window.onload = function(){
             var contenedor = document.getElementById('contenedor_carga');
             contenedor.style.visibility = 'hidden';
             contenedor.style.opacity = '0'; 
         }
     </script>
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('#example').DataTable();
-        } );
-    </script>
-</body>
-</html>
+{% endblock %}

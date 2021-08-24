@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Recibo;
 use App\Entity\User;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,11 +16,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-
 use App\Form\CargarRecibosType;
+
 class ReciboController extends AbstractController
 {
-    /**
+     /**
      * Carga una lista de recibos a la tabla recibos de la bd y los guarda en una carpeta uploads
      * 
      * conficurar php.ini server
@@ -27,7 +28,7 @@ class ReciboController extends AbstractController
      * max_file_uploads = 600
      * 
      * 
-     * @Route("/cargarRecibo", name="app_cargar_recibo")
+     * @Route("/admin/cargarRecibo", name="app_cargar_recibo")
      */
     public function cargarRecibo(Request $request,SluggerInterface $slugger){
         $manager= $this->getDoctrine()->getManager();
@@ -142,32 +143,43 @@ class ReciboController extends AbstractController
 
     /**
      * 
-     * @Route("/recibo", name="app_recibo")
+     * @Route("/superadmin/recibo", name="app_recibo" , methods={"POST"} )
      */
-    public function recibo()
+    public function recibo(Request $request)
     {
-        $manager= $this->getDoctrine()->getManager();
-        //traer todos los usuarios
-        $recibos= $manager->getRepository(Recibo::class)->findAll();
 
-        return $this->render('recibo/dataTable.html.twig', ["recibos"=> $recibos]);
+        $manager= $this->getDoctrine()->getManager();
+
+        $datos['anioLegajo'] = $request->get('anioLegajo');
+
+        //traer todos los usuarios
+        // $recibos= $manager->getRepository(Recibo::class)->findAll();
+        $recibos= $manager->getRepository(Recibo::class)->findBy(["anio"=>$datos['anioLegajo']]);
+        $formulario = $this->createForm(CargarRecibosType::class);
+        $formulario->handleRequest($request);
+
+        return $this->render('recibo/dataTable.html.twig', ["recibos"=> $recibos, 'formulario' => $formulario->createView()]);
     }
     /**
      * 
-     * @Route("/recibo/{id}", name="app_recibo_id")
+     * @Route("/user/recibo/{id}", name="app_recibo_id")
      */
-    public function reciboId($id)
+    public function reciboId(Request $request, $id)
     {
         $manager= $this->getDoctrine()->getManager();
         //traer todos los usuarios
-        $recibos= $manager->getRepository(Recibo::class)->findOneBy(array('legajo' => $id));
-        if(!$recibos!=null){
+        $recibos= $manager->getRepository(Recibo::class)->findBy(array('legajo' => $id));
+        $formulario = $this->createForm(CargarRecibosType::class);
+        $formulario->handleRequest($request);
+        if($recibos!=null){
             $this -> addFlash('success', 'Ya puede visualizar su Recibo de Sueldo!');
-            return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
+            return $this->render('recibo/dataTable.html.twig', ['recibos'=> $recibos, 'formulario' => $formulario->createView()]);
             
+        }else{
+            // $this -> addFlash('error', '(id)Error no pudimos cargar sus Recibos de Sueldo, si el error persiste consultar a soporte@unraf.com.ar');
+            return $this->render('recibo/dataTable.html.twig', ['recibos'=> $recibos, 'formulario' => $formulario->createView()]);
         }
-        $this -> addFlash('error', '(id)Error no pudimos cargar sus Recibos de Sueldo, si el error persiste consultar a soporte@unraf.com.ar');
-        return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
+       
     }
     /**
      * 
@@ -177,14 +189,15 @@ class ReciboController extends AbstractController
     {
         $manager= $this->getDoctrine()->getManager();
         //traer todos los usuarios
-        $recibos= $manager->getRepository(Recibo::class)->findOneBy(array('anio' => $anio));
-        if(!$recibos!=null){
+        $recibos= $manager->getRepository(Recibo::class)->findBy(array('anio' => $anio));
+       
+        if($recibos!=null){
             $this -> addFlash('success', 'Ya puede visualizar su Recibo de Sueldo!');
-            return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
+            return $this->render('recibo/data.html.twig', ["recibos"=> $recibos]);
             
         }
         $this -> addFlash('error', '(Anio)Error no pudimos cargar sus Recibos de Sueldo, si el error persiste consultar a soporte@unraf.com.ar');
-        return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
+        return $this->render('recibo/data.html.twig', ["recibos"=> $recibos]);
     }
     /**
      * 
@@ -194,8 +207,8 @@ class ReciboController extends AbstractController
     {
         $manager= $this->getDoctrine()->getManager();
         //traer todos los usuarios
-        $recibos= $manager->getRepository(Recibo::class)->findOneBy(array('anio' => $mes));
-        if(!$recibos!=null){
+        $recibos= $manager->getRepository(Recibo::class)->findOneBy(array('mes' => $mes));
+        if($recibos!=null){
             $this -> addFlash('success', 'Ya puede visualizar su Recibo de Sueldo!');
             return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
             
@@ -217,73 +230,4 @@ class ReciboController extends AbstractController
         return $this->render('recibo/listarRecibos.html.twig', ["recibos"=> $recibos]);
     }
     
-
-
-    /**
-     * @Route("/load", name="load")
-     */
-    public function load()
-    {
-        set_time_limit(8100);
-        $manager= $this->getDoctrine()->getManager();
-        //traer todos los usuarios
-        $user= $manager->getRepository(User::class)->findAll();
-        $array = array(
-            1=> "Enero",
-            2=> "Febrero",
-            3=> "Marzo",
-            4=> "Abril",
-            5=> "Mayo",
-            6=> "Junio",
-            7=> "Julio",
-            8=> "Agosto",
-            9=> "Septiembre",
-            10=> "Octubre",
-            11=> "Noviembre",
-            12=> "Diciembre",
-            13=> "SAC Junio",
-            14=> "SAC Diciembre"
-        );
-        
-        foreach ($user as $usuarios) {
-            $legajo= $usuarios->getLegajo();
-            $email= $usuarios-> getEmail();
-            $id= $usuarios-> getId();
-            $i=2018;
-            $fechaCarga= new \DateTime();
-            $anioActual= date("Y");
-            //recorro las carpetas por año, mes
-            //if(!$legajo=null){
-                while ($i <= 2021 && $legajo!=null ) {
-                    foreach ($array as $mes) {
-                        $uploads_dir = '..\\uploads\\recibos\\'."".$i.'\\'."".$mes;
-                        
-                        $configDirectories = array($uploads_dir);
-                        //pregunto si existe el archivo en la direccion
-                        $pathArchive='\\Intranet\\uploads\\recibos\\'."".$i.'\\'."".$mes.'\\'."".$legajo.".pdf";
-                        
-                        if (file_exists('..\\uploads\\recibos\\'."".$i.'\\'."".$mes.'\\'."".$legajo.".pdf")) {
-                            //guardo recibos en la tabla
-                            
-                            $anio=$i;
-                            $estado="Activo";
-                            $recibo= new Recibo($legajo, $email, $fechaCarga, $pathArchive, $anio,$mes, $estado);
-                            
-                            $manager->persist($recibo);
-                            $manager->flush();
-                        } else {
-                        ////////no hace nada
-                        }
-                
-                    }
-                    $i++;
-                }
-        //  }
-            
-        }
-        return $this->redirectToRoute("redirectInicio");
-
-    }
-
-
 }

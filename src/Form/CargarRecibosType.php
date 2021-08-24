@@ -20,9 +20,8 @@ class CargarRecibosType extends AbstractType
     {
         $builder
         ->add('archivos', FileType::class, [
-            'attr' => ['class' => 'form-control camposEstandar', 'placeholder' => 'Año Cargado'],
             'multiple' => true,
-            
+            'required' => true
         ])
         // unmapped means that this field is not associated to any entity property
         
@@ -31,7 +30,7 @@ class CargarRecibosType extends AbstractType
         ->add('mes', ChoiceType::class, [
             'attr' => ['class' => 'form-control camposEstandar', 'placeholder' => 'Año Cargado'],
             'choices'  => [
-                '' => '',
+                'Seleccione una opción' => '',
                 'Enero' => 'Enero',
                 'Febrero' => 'Febrero',
                 'Marzo' => 'Marzo',
@@ -47,10 +46,12 @@ class CargarRecibosType extends AbstractType
                 'Diciembre' => 'Diciembre',
                 'SAC Diciembre' => 'SAC Diciembre',
             ],
+            'required'=>true
         ])
         ->add('fecha', DateType::class, [
             'attr' => array('class' => 'form-control camposEstandar', 'placeholder' => 'Año Cargado'),
-            'widget' => 'single_text'
+            'widget' => 'single_text',
+            'required'=>true
         ])
         
         ->add('Guardar',SubmitType::class)
